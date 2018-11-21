@@ -79,6 +79,14 @@ var maxLocationY = 630;
     return stringFeatures;
  };
 
+//Рандомные координаты
+var RandomLocation=function(){
+  var x=randomMaxMin(minLocationX,maxLocationX);
+  var y=randomMaxMin(minLocationY,maxLocationY);
+ return {x,y};
+};
+var coords=RandomLocation();
+
 
  //Массив карточек
 var announcement =[];
@@ -90,7 +98,7 @@ for (j=0; j<8; j++){
     },
     offer:{
       title1:titleAr[j],
-      adress:'600,300',
+      adress:coords.x+' , '+coords.y ,
       price:randomMaxMin(1000,1000000),
       type1:typeAr[randomf(typeAr.length)],
       rooms:randomMaxMin(1,5),
@@ -102,11 +110,14 @@ for (j=0; j<8; j++){
       photos:RandomSortArray(photosAr)
     },
     location:{
-      x:randomMaxMin(minLocationX,maxLocationX),
-      y:randomMaxMin(minLocationY,maxLocationY)
+      x:coords.x,
+      y:coords.y
     }
   };
+  var coords=RandomLocation();
+
 }
+
 //Убираем класс .map--faded у блока .map
 document.querySelector('.map').classList.remove('map--faded');
 
