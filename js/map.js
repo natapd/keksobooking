@@ -29,11 +29,16 @@ var photosAr=[
 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
 var similarListElement=document.querySelector('.map__pins');
+
 var parentElementCard=document.querySelector('.map');
 var ElementBefore=document.querySelector('.map__filters-container');
+var MapPinMail=document.querySelector('.map__pin--main');
+var YourForm=document.querySelector('.notice');
+var FieldsetElem=YourForm.querySelectorAll('fieldset');
 var templatePin=document.querySelector('#pin').content.querySelector('.map__pin');
 var templateCard=document.querySelector('#card').content.querySelector('.map__card');
 var map = document.querySelector('.map');
+
 var pinWidth = 50;
 var pinHeight = 70;
 var TypeHousing;
@@ -118,25 +123,19 @@ for (j=0; j<8; j++){
 
 }
 
-//Убираем класс .map--faded у блока .map
-document.querySelector('.map').classList.remove('map--faded');
+
 
 // Функция копирует шаблон меток объявлений и заполняет его данными
-var renderAnnounce = function (announ){
+var renderAnnounce = function (announ,index){
   var element=templatePin.cloneNode(true);
     element.style.left=(announ.location.x-pinWidth/2)+'px';
     element.style.top=announ.location.y-pinHeight+'px';
     element.querySelector('img').src=announ.autor.avatar;
     element.querySelector('img').alt=announ.offer.title1;
+    element.setAttribute('data-index', index);
   return element;
 };
 
-var fragment=document.createDocumentFragment();
-for( var i=0; i<announcement.length;i++){
- fragment.appendChild(renderAnnounce(announcement[i]));
-  }
-//Вставка фрагмента с метками в .map__pins
-similarListElement.appendChild(fragment);
 
 //функция копирует шаблон модального окна с информацией по объявлению
 var renderCard=function(announ){
@@ -171,11 +170,189 @@ return element;
 };
 
 
+var InsertPins=function(){
+  // Пины на карте
+   var fragment=document.createDocumentFragment();
+  for( var i=0; i<announcement.length;i++){
+    fragment.appendChild(renderAnnounce(announcement[i],i));
+
+    }
+  //Вставка фрагмента с метками в .map__pins
+    similarListElement.appendChild(fragment);
+};
+
+//Функция удаления обработчика
+var removeHendel=function(){
+  MapPinMail.removeEventListener('mouseup',onActivePage);
+  MapPinMail.removeEventListener('keydown',onActivePage);
+};
+
+
+
+var onPinclick=function(){
+//Проверка нахождения пина
+    var otherPins=map.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+for(var i=0; i<otherPins.length;i++ ){
+ otherPins[i].addEventListener('click',OpenCard);
+
+}
+};
+
+var OpenCard=function(evt){//Открыта карточка объявления
+ var dataIndex=evt.currentTarget.getAttribute('data-index');
+ console.log(dataIndex);
+  var fragment2=document.createDocumentFragment();
+  //for( var i=0; i<announcement.length;i++){
+   fragment2.appendChild(renderCard(announcement[dataIndex]));
+  //};
+
+  //Вставка фрагмента в блок .map перед блоком .map__filter-container
+  parentElementCard.insertBefore(fragment2,ElementBefore);};
+
+//Функция обработчика перевода страницы в активное состояние
+var onActivePage=function(evt){
+
+  //Убираем класс .map--faded у блока .map
+  document.querySelector('.map').classList.remove('map--faded');
+  YourForm.querySelector('.ad-form').classList.remove('ad-form--disabled');
+
+  //Удаляем атрибут формы
+    for (var i=0; i<FieldsetElem.length;i++){
+    FieldsetElem[i].removeAttribute("disabled");
+    }
+
+  //Вставляем координаты главного пина в инпут адреса
+  var AddressInput=YourForm.querySelector('#address');
+  AddressInput.value=(parseInt(MapPinMail.style.left,10)+pinWidth/2)+' , '+(parseInt(MapPinMail.style.top,10)+pinHeight);
+
+  //Вызов функции вставки пинов
+  InsertPins();
+  // Удаление обработчика нажатия на главный пин
+  removeHendel();
+  // Вызов функции нажатия на пин
+  onPinclick();
+};
+
+
+//Делаем форму неактивной
+for (var i=0; i<FieldsetElem.length;i++){
+FieldsetElem[i].setAttribute("disabled", "disabled");
+}
+
+// Обработчик события на опускание мыши главного пина
+MapPinMail.addEventListener('mouseup',onActivePage);
+MapPinMail.addEventListener('keydown',function(evt){
+if (evt.keyCode===13){onActivePage();}
+});
+
+
+/* //Открыта карточка объявления
 var fragment2=document.createDocumentFragment();
 for( var i=0; i<announcement.length;i++){
  fragment2.appendChild(renderCard(announcement[0]));
 };
 
 //Вставка фрагмента в блок .map перед блоком .map__filter-container
-parentElementCard.insertBefore(fragment2,ElementBefore);
+parentElementCard.insertBefore(fragment2,ElementBefore); */
 
+// Доверяй, но проверяй
+var typeField =YourForm.querySelector('#type');
+var costField =YourForm.querySelector('#price');
+var timeinField=YourForm.querySelector('#timein');
+var timeoutField=YourForm.querySelector('#timeout');
+var roomNumberField=YourForm.querySelector('#room_number');
+var capacityField=YourForm.querySelector('#capacity');
+
+//функция изменения типа жилья и ограничение минимальной цены
+var onChangeType =function(){
+if (typeField.value==='bungalo'){
+  costField.min='0';
+  costField.placeholder='0';
+
+}
+if (typeField.value==='flat'){
+  costField.min='1000';
+  costField.placeholder='1000';
+
+}
+if (typeField.value==='house'){
+  costField.min='5000';
+  costField.placeholder='5000';
+
+}
+if (typeField.value==='palace'){
+  costField.min='10000';
+  costField.placeholder='10000';
+
+}
+};
+
+//вызов обработчика при изменении типа жилья
+typeField.addEventListener('change',onChangeType);
+
+//Функция зависимости время выезда, от время заезда и наоборот
+
+var onTimeOutToTimeIn =function(){
+  timeoutField.value=timeinField.value;
+  };
+var onTimeInToTimeOut =function(){
+  timeinField.value=timeoutField.value;
+  };
+timeinField.addEventListener('change',onTimeOutToTimeIn);
+timeoutField.addEventListener('change',onTimeInToTimeOut);
+
+ //Функция соответствия количества гостей количеству комнат
+var onChangeRoomNumber=function(){
+  capacityField.querySelector('option[value="1"]').disabled=false;
+  capacityField.querySelector('option[value="3"]').disabled=false;
+  capacityField.querySelector('option[value="2"]').disabled=false;
+  capacityField.querySelector('option[value="0"]').disabled=false;
+
+if (roomNumberField.value==='1'){
+  capacityField.querySelector('option[value="1"]').selected=true;
+  capacityField.querySelector('option[value="3"]').disabled=true;
+  capacityField.querySelector('option[value="2"]').disabled=true;
+  capacityField.querySelector('option[value="0"]').disabled=true;
+}
+if (roomNumberField.value==='2'){
+  capacityField.querySelector('option[value="2"]').selected=true;
+  capacityField.querySelector('option[value="3"]').disabled=true;
+  capacityField.querySelector('option[value="0"]').disabled=true;
+}
+if (roomNumberField.value==='3'){
+  capacityField.querySelector('option[value="3"]').selected=true;
+  capacityField.querySelector('option[value="0"]').disabled=true;
+}
+if (roomNumberField.value==='100'){
+  capacityField.querySelector('option[value="0"]').selected=true;
+  capacityField.querySelector('option[value="3"]').disabled=true;
+  capacityField.querySelector('option[value="2"]').disabled=true;
+  capacityField.querySelector('option[value="1"]').disabled=true;
+}
+};
+roomNumberField.addEventListener('change',onChangeRoomNumber);
+
+var templateSuccess=document.querySelector('#success').content.querySelector('.success');
+
+// Функции для подсвечиваня невалидвой формы
+var isInvalid = function (input) {
+  if (input.checkValidity() === false) {
+    input.style.boxShadow = '0 0 2px 2px #ff6547';
+  }
+};
+var isValid = function (input) {
+  if (input.checkValidity() === true) {
+    input.style.boxShadow = 'none';
+  }
+};
+
+
+var ButtonSubmit=YourForm.querySelector('.ad-form__submit');
+
+ButtonSubmit.addEventListener('click',function(){
+ isInvalid(YourForm.querySelector('#title'));
+  isInvalid(YourForm.querySelector('#price'));
+  isValid(YourForm.querySelector('#title'));
+  isValid(YourForm.querySelector('#price'));
+});
