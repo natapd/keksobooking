@@ -13,9 +13,28 @@ var removeHendel=function(){
   MapPinMail.removeEventListener('mouseup',onActivePage);
   MapPinMail.removeEventListener('keydown',onActivePage);
 };
+var onSuccess=function(announ){
+  window.announcement=announ;
+  console.log(window.announcement);
 
+  InsertPins(announ);
+};
+var InsertPins=function(announ){
+  // Пины на карте
+ // window.backend.load(window.onSuccess,ErrorHand);
+   var fragment=document.createDocumentFragment();
+  for( var i=0; i<announ.length;i++){
+    fragment.appendChild(window.pin.renderAnnounce(announ[i],i));
+
+    }
+  //Вставка фрагмента с метками в .map__pins
+    similarListElement.appendChild(fragment);
+    onPinclick();
+};
+/*
 var InsertPins=function(){
   // Пины на карте
+ // window.backend.load(window.onSuccess,ErrorHand);
    var fragment=document.createDocumentFragment();
   for( var i=0; i<announcement.length;i++){
     fragment.appendChild(window.pin.renderAnnounce(window.announcement[i],i));
@@ -23,10 +42,14 @@ var InsertPins=function(){
     }
   //Вставка фрагмента с метками в .map__pins
     similarListElement.appendChild(fragment);
+}; */
+var ErrorHand=function(err){
+  console.log(err);
 };
 
 var onPopupClose=function(){
 document.querySelector('.map__card').remove();
+document.querySelector('.map__pin--active').classList.remove('map__pin--active');
 document.removeEventListener('keydown',PressECSonPopup);
 
 };
@@ -36,19 +59,28 @@ var PressECSonPopup=function(evt)
  };
 
 var onPinclick=function(){
-//Проверка нахождения пина
-    var otherPins=map.querySelectorAll('.map__pin:not(.map__pin--main)');
 
+//  card.remove();
+
+//Проверка нахождения пина
+var otherPins=map.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+console.log(otherPins[1]);
 for(var i=0; i<otherPins.length;i++ ){
+
  otherPins[i].addEventListener('click',OpenCard);
 
 }
 };
 
-var OpenCard=function(evt){//Открыта карточка объявления
-
+var OpenCard=function(evt){
+  var otherPin=map.querySelectorAll('.map__pin:not(.map__pin--main)');
+//Открыта карточка объявления
+console.log('Пробую открыть');
  var dataIndex=evt.currentTarget.getAttribute('data-index');
- //console.log(dataIndex);
+ evt.currentTarget.classList.add('map__pin--active');
+ console.log(evt.currentTarget);
+
   var fragment2=document.createDocumentFragment();
 
   fragment2.appendChild(window.card.renderCard(window.announcement[dataIndex]));
@@ -57,7 +89,15 @@ var OpenCard=function(evt){//Открыта карточка объявлени�
   parentElementCard.insertBefore(fragment2,ElementBefore);
   var PopupButton=document.querySelector('.popup__close');
 
-  PopupButton.addEventListener('click',onPopupClose);
+
+  for(var i=0; i<otherPin.length;i++ ){
+
+ otherPin[i].addEventListener('click',function(evt){
+  onPopupClose();
+  OpenCard(evt);
+ });
+}
+PopupButton.addEventListener('click',onPopupClose);
   document.addEventListener('keydown',PressECSonPopup);
 };
 
@@ -77,12 +117,14 @@ var onActivePage=function(evt){
 
   //Вставляем координаты главного пина в инпут адреса
  setActiveAddressInput();
-  //AddressInput.value=(parseInt(MapPinMail.style.left,10)+window.data.pinWidth/2)+' , '+(parseInt(MapPinMail.style.top,10)+window.data.pinHeight);
 
+window.backend.load(onSuccess,ErrorHand);
+
+console.log('массив '+window.announcement);
   //Вызов функции вставки пинов
-  InsertPins();
+ // InsertPins();
  // Вызов функции нажатия на пин
-   onPinclick();
+
 };
 
 

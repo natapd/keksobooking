@@ -93,10 +93,38 @@ var RandomLocation=function(){
  return {x,y};
 };
 var coords=RandomLocation();
-
-
- //Массив карточек
+/*
+window.onSuccess=function(ann){
 window.announcement =[];
+for (j=0; j<ann.length; j++){
+
+  announcement[j]={
+    autor:{
+      avatar:ann[j].autor.avatar,
+    },
+    offer:{
+      title1:ann[j].offer.title,
+      adress:ann[j].offer.address ,
+      price:ann[j].offer.price,
+      type1:ann[j].offer.type,
+      rooms:ann[j].offer.rooms,
+      guests:ann[j].offer.guests,
+      checkin:ann[j].offer.checkin,
+      checkout:ann[j].offer.checkout,
+      features:ann[j].offer.features,
+      discription:ann[j].offer.discription,
+      photos:ann[j].offer.photos
+    },
+    location:{
+      x:ann[j].location.x,
+      y:ann[j].location.y
+    }
+  };
+ }
+};
+*/
+ //Массив карточек
+/*window.announcement =[];
 for (j=0; j<8; j++){
 
   announcement[j]={
@@ -123,5 +151,5 @@ for (j=0; j<8; j++){
   };
   var coords=RandomLocation();
 
-}
+} */
 })();
