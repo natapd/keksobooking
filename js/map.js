@@ -21,36 +21,27 @@ var onSuccess=function(announ){
 };
 var InsertPins=function(announ){
   // Пины на карте
- // window.backend.load(window.onSuccess,ErrorHand);
+
    var fragment=document.createDocumentFragment();
   for( var i=0; i<announ.length;i++){
-    fragment.appendChild(window.pin.renderAnnounce(announ[i],i));
+    fragment.appendChild(window.pin.renderAnnounce(announ[i]));
 
     }
   //Вставка фрагмента с метками в .map__pins
     similarListElement.appendChild(fragment);
-    onPinclick();
-};
-/*
-var InsertPins=function(){
-  // Пины на карте
- // window.backend.load(window.onSuccess,ErrorHand);
-   var fragment=document.createDocumentFragment();
-  for( var i=0; i<announcement.length;i++){
-    fragment.appendChild(window.pin.renderAnnounce(window.announcement[i],i));
 
-    }
-  //Вставка фрагмента с метками в .map__pins
-    similarListElement.appendChild(fragment);
-}; */
-var ErrorHand=function(err){
-  console.log(err);
 };
+
+
 
 var onPopupClose=function(){
-document.querySelector('.map__card').remove();
-document.querySelector('.map__pin--active').classList.remove('map__pin--active');
-document.removeEventListener('keydown',PressECSonPopup);
+  var oldCard = map.querySelector('.map__card');
+    if (oldCard) {
+      document.removeEventListener('keydown', PressECSonPopup);
+      document.querySelector('.popup__close').removeEventListener('click', onPopupClose);
+      document.querySelector('.map__pin--active').classList.remove('map__pin--active');
+      map.removeChild(oldCard);
+    }
 
 };
 var PressECSonPopup=function(evt)
@@ -58,45 +49,21 @@ var PressECSonPopup=function(evt)
   {onPopupClose();}
  };
 
-var onPinclick=function(){
 
-//  card.remove();
 
-//Проверка нахождения пина
-var otherPins=map.querySelectorAll('.map__pin:not(.map__pin--main)');
+var OpenCard=function(pins){
 
-console.log(otherPins[1]);
-for(var i=0; i<otherPins.length;i++ ){
-
- otherPins[i].addEventListener('click',OpenCard);
-
-}
-};
-
-var OpenCard=function(evt){
-  var otherPin=map.querySelectorAll('.map__pin:not(.map__pin--main)');
-//Открыта карточка объявления
-console.log('Пробую открыть');
- var dataIndex=evt.currentTarget.getAttribute('data-index');
- evt.currentTarget.classList.add('map__pin--active');
- console.log(evt.currentTarget);
 
   var fragment2=document.createDocumentFragment();
 
-  fragment2.appendChild(window.card.renderCard(window.announcement[dataIndex]));
+  fragment2.appendChild(window.card.renderCard(pins));
 
   //Вставка фрагмента в блок .map перед блоком .map__filter-container
   parentElementCard.insertBefore(fragment2,ElementBefore);
   var PopupButton=document.querySelector('.popup__close');
 
 
-  for(var i=0; i<otherPin.length;i++ ){
 
- otherPin[i].addEventListener('click',function(evt){
-  onPopupClose();
-  OpenCard(evt);
- });
-}
 PopupButton.addEventListener('click',onPopupClose);
   document.addEventListener('keydown',PressECSonPopup);
 };
@@ -118,16 +85,22 @@ var onActivePage=function(evt){
   //Вставляем координаты главного пина в инпут адреса
  setActiveAddressInput();
 
-window.backend.load(onSuccess,ErrorHand);
+window.backend.load(onSuccess,window.messages.onError);
 
 console.log('массив '+window.announcement);
-  //Вызов функции вставки пинов
- // InsertPins();
- // Вызов функции нажатия на пин
 
 };
 
-
+var ResetPage=function(){
+ document.querySelector('.map').classList.add('map--faded');
+  YourForm.querySelector('.ad-form').classList.add('ad-form--disabled');
+  var Pins=map.querySelectorAll('.map__pin:not(.map__pin--main)');
+  for (var j=0; j<Pins.length;j++){
+Pins[j].remove();
+  }
+  resetPinMain();
+  window.form.resetForm();
+};
 
 OnMouseDown=function(evt){
   evt.preventDefault();
@@ -192,7 +165,11 @@ if (evt.keyCode===13){
   onActivePage();
 }
 });
-
+var resetPinMain = function () {
+    MapPinMail.style.left = '570px';
+    MapPinMail.style.top = '375px';
+   AddressInput.value = calculateInactiveMainPinCoordinats();
+  };
 // Функция для расчета координат адреса в активном состоянии страницы
   var calculateActiveMainPinCoordinats = function () {
     console.log(MapPinMail.offsetLeft+'1 '+MapPinMail.offsetTop);
@@ -212,6 +189,10 @@ if (evt.keyCode===13){
   };
 
 AddressInput.value = calculateInactiveMainPinCoordinats();
-
+window.map = {
+    ResetPage:ResetPage,
+    onPopupClose: onPopupClose,
+    OpenCard:OpenCard,
+  };
 
 })();

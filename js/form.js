@@ -1,5 +1,6 @@
 (function(){
 // Доверяй, но проверяй
+var map = document.querySelector('.map');
 var YourForm=document.querySelector('.notice');
 var typeField =YourForm.querySelector('#type');
 var costField =YourForm.querySelector('#price');
@@ -7,7 +8,11 @@ var timeinField=YourForm.querySelector('#timein');
 var timeoutField=YourForm.querySelector('#timeout');
 var roomNumberField=YourForm.querySelector('#room_number');
 var capacityField=YourForm.querySelector('#capacity');
-
+var adForm = document.querySelector('.ad-form');
+var templateSuccess=document.querySelector('#success').content.querySelector('.success');
+ var selects = document.querySelectorAll('select');
+  var inputs = document.querySelectorAll('input');
+  var textarea = document.querySelectorAll('textarea');
 //функция изменения типа жилья и ограничение минимальной цены
 var onChangeType =function(){
 if (typeField.value==='bungalo'){
@@ -77,7 +82,7 @@ if (roomNumberField.value==='100'){
 };
 roomNumberField.addEventListener('change',onChangeRoomNumber);
 
-var templateSuccess=document.querySelector('#success').content.querySelector('.success');
+
 
 // Функции для подсвечиваня невалидвой формы
 var isInvalid = function (input) {
@@ -90,14 +95,58 @@ var isValid = function (input) {
     input.style.boxShadow = 'none';
   }
 };
+closePopup=function(){
 
+};
+var onLoad=function(){
+  console.log('Отправилась');
+};
 
 var ButtonSubmit=YourForm.querySelector('.ad-form__submit');
 
-ButtonSubmit.addEventListener('click',function(){
- isInvalid(YourForm.querySelector('#title'));
+ButtonSubmit.addEventListener('click',function(evt){
+  evt.preventDefault();
+  window.backend.save(new FormData(YourForm), window.messages.onSuccess,window.messages.onError );
+ /* isInvalid(YourForm.querySelector('#title'));
   isInvalid(YourForm.querySelector('#price'));
   isValid(YourForm.querySelector('#title'));
-  isValid(YourForm.querySelector('#price'));
+  isValid(YourForm.querySelector('#price')); */
 });
+var ButtonReset=YourForm.querySelector('.ad-form__reset');
+ButtonReset.addEventListener('click',function(evt){
+evt.preventDefault();
+window.map.ResetPage();
+});
+
+var resetForm = function () {
+    adForm.querySelector('#title').value = '';
+    adForm.querySelector('#type').value = 'flat';
+    adForm.querySelector('#price').value = '';
+    adForm.querySelector('#room_number').value = '1';
+    adForm.querySelector('#capacity').value = '3';
+    adForm.querySelector('#timein').value = '12:00';
+    adForm.querySelector('#timeout').value = '12:00';
+    adForm.querySelector('#description').textContent = '';
+
+    var features = document.querySelectorAll('.feature__checkbox');
+    for (var i = 0; i < features.length; i++) {
+      features[i].checked = false;
+    }
+    window.disableFieldsCheck(true);
+  };
+  var disableFields = function (isdisabled, fields) {
+    for (var i = 0; i < fields.length; i++) {
+      fields[i].disabled = isdisabled;
+    }
+  };
+
+  // проверяем состояние полей
+  window.disableFieldsCheck = function (isfielddisabled) {
+    disableFields(isfielddisabled, inputs);
+    disableFields(isfielddisabled, selects);
+    disableFields(isfielddisabled, textarea);
+  };
+  window.form={
+resetForm:resetForm
+  };
 })();
