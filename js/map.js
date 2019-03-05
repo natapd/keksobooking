@@ -15,7 +15,7 @@ var removeHendel=function(){
 };
 var onSuccess=function(announ){
   window.announcement=announ;
-  console.log(window.announcement);
+  //console.log(window.announcement);
 
   InsertPins(announ);
 };
@@ -31,7 +31,16 @@ var InsertPins=function(announ){
     similarListElement.appendChild(fragment);
 
 };
+window.updatePins=function(){
+  //console.log(  window.announcement);
 
+  var filter=window.filtredAnnoun(window.announcement);
+  console.log(filter);
+  onPopupClose();
+  ResetPins();
+  InsertPins(filter);
+
+};
 
 
 var onPopupClose=function(){
@@ -87,19 +96,22 @@ var onActivePage=function(evt){
 
 window.backend.load(onSuccess,window.messages.onError);
 
-console.log('массив '+window.announcement);
+//console.log('массив '+window.announcement);
 
 };
-
-var ResetPage=function(){
- document.querySelector('.map').classList.add('map--faded');
-  YourForm.querySelector('.ad-form').classList.add('ad-form--disabled');
+var ResetPins=function(){
   var Pins=map.querySelectorAll('.map__pin:not(.map__pin--main)');
   for (var j=0; j<Pins.length;j++){
 Pins[j].remove();
   }
+};
+var ResetPage=function(){
+ document.querySelector('.map').classList.add('map--faded');
+  YourForm.querySelector('.ad-form').classList.add('ad-form--disabled');
+  ResetPins();
   resetPinMain();
   window.form.resetForm();
+  window.resetFilter();
 };
 
 OnMouseDown=function(evt){
@@ -110,7 +122,7 @@ OnMouseDown=function(evt){
      y:evt.clientY
   };
   var dragged=false;
-  console.log(startCoord);
+  //console.log(startCoord);
 
       var OnMouseMove=function(moveEvt){
          moveEvt.preventDefault();
@@ -172,7 +184,7 @@ var resetPinMain = function () {
   };
 // Функция для расчета координат адреса в активном состоянии страницы
   var calculateActiveMainPinCoordinats = function () {
-    console.log(MapPinMail.offsetLeft+'1 '+MapPinMail.offsetTop);
+    //console.log(MapPinMail.offsetLeft+'1 '+MapPinMail.offsetTop);
     return (MapPinMail.offsetLeft + (window.data.pinWidth / 2)) + ', ' + (MapPinMail.offsetTop + window.data.pinHeight);
 
   };
