@@ -90,7 +90,7 @@ var onActivePage=function(evt){
     for (var i=0; i<FieldsetElem.length;i++){
     FieldsetElem[i].removeAttribute("disabled");
     }
-
+window.disableFieldsCheck(false);
   //Вставляем координаты главного пина в инпут адреса
  setActiveAddressInput();
 
@@ -112,6 +112,7 @@ var ResetPage=function(){
   resetPinMain();
   window.form.resetForm();
   window.resetFilter();
+  window.RemovePic();
 };
 
 OnMouseDown=function(evt){
